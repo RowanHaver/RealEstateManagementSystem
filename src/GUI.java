@@ -28,7 +28,10 @@ public class GUI extends Application implements Serializable {
 
     HBox addBox;
 
+    static ArrayList<Property> props = new ArrayList<Property>(); // creates variable props of type arraylist that stores property
+
     PropTable PropertyTableClass = new PropTable();
+    Property PropertyClass = new Property();
 
     public static void main(String[] args) {
         launch(args);
@@ -93,6 +96,7 @@ public class GUI extends Application implements Serializable {
         root.setTop(TopBox);
         root.setLeft(sideMenu);
 
+
         stage.setScene(new Scene(root));
         stage.show();
 
@@ -156,6 +160,10 @@ public class GUI extends Application implements Serializable {
 
     public ObservableList<Property> getProperty(){
         ObservableList<Property> properties = FXCollections.observableArrayList();
+        readProperty();
+        for (int i = 0; i < props.size(); i++){
+            properties.add(props.get(i));
+        }
         return properties;
     }
 
@@ -172,6 +180,9 @@ public class GUI extends Application implements Serializable {
         property.setStreet(PropertyTableClass.streetInput.getText());
         property.setNumber(Integer.parseInt(PropertyTableClass.streetNumberInput.getText()));
         property.setPropertyID(Integer.parseInt(PropertyTableClass.PropertyIDInput.getText()));
+        props.add(property);
+        writeProperty();
+        //readProperty();
         propertyTable.getItems().add(property);
         PropertyTableClass.propTypeInput.clear();
         PropertyTableClass.bedroomInput.clear();
@@ -185,13 +196,105 @@ public class GUI extends Application implements Serializable {
         PropertyTableClass.PropertyIDInput.clear();
     }
 
+
+
     public void deleteButton(){
         ObservableList<Property> propertySelected, allProperties;
-        allProperties = propertyTable.getItems(); //
+        allProperties = propertyTable.getItems();
         propertySelected = propertyTable.getSelectionModel().getSelectedItems();
+        Property propertySelect = propertyTable.getSelectionModel().getSelectedItem(); //get selected accessing property
+        //propertySelected.forEach(allProperties::remove); // removes all properties selected
+        System.out.println(propertySelect.propertyID);
+        for(int i = 0; i < props.size(); i++){ //looping through array
+            if (propertySelect.propertyID == props.get(i).propertyID) { // if tableview contains
+                props.remove(i);
+            }
+        }
+        if (propertySelected != null) {
+            ArrayList<Property> rows = new ArrayList<>(propertySelected);
+            rows.forEach(row -> propertyTable.getItems().remove(row));
+        }
+        writeProperty();
+        //readProperty();
 
-        propertySelected.forEach(allProperties::remove); // removes all properties selected
+        //props.remove(p);
+
+
     }
+    /*
+            for (int i = 0; i < props.size(); i++){
+            properties.add(props.get(i));
+        }
+
+            Scanner scanInput = new Scanner(System.in);
+        System.out.println("First property begins with 0, Enter number to delete: "); // asks user for input in which tenant to delete
+        int i = scanInput.nextInt();
+        props.remove(i); // removes property array with users input
+        writeProperty();
+        readProperty();
+     */
+
+
+
+    /*
+    public void printPropertiesGUI() {
+        //System.out.format("%15s %10d %10d %15d %20s %20s %20s %12s %18s %10d ",propertyType,bedrooms,bathrooms,squareFeet,country,city,location,firstName,status,rent);
+        Property p;
+        // formats the length and prints above
+        System.out.format("%15s %10s %10s %15s %20s %20s %20s %12s %18s %10s","Property type", "Bedrooms","Bathrooms","Square Feet","Country","City","Address","Street","Number","PropertyID");
+        for (int i = 0; i < showing.size(); i++) { // for loop and checks if i is below the props arraylist size
+            System.out.println("");
+            p = List.get(i); //props.get gets the element of a specified index(i) within the list
+            p.printProperty(); // calls printProperty method in Property class
+        }
+    }
+
+     */
+
+
+    public static void printProperties() {
+        //System.out.format("%15s %10d %10d %15d %20s %20s %20s %12s %18s %10d ",propertyType,bedrooms,bathrooms,squareFeet,country,city,location,firstName,status,rent);
+        Property p;
+        // formats the length and prints above
+        System.out.format("%15s %10s %10s %15s %20s %20s %20s %12s %18s %10s","Property type", "Bedrooms","Bathrooms","Square Feet","Country","City","Address","Street","Number","PropertyID");
+        for (int i = 0; i < props.size(); i++) { // for loop and checks if i is below the props arraylist size
+            System.out.println("");
+            p = props.get(i); //props.get gets the element of a specified index(i) within the list
+            p.printProperty(); // calls printProperty method in Property class
+        }
+    }
+
+
+    public static void readProperty(){
+        try{
+            FileInputStream readData = new FileInputStream("propertyData");
+            ObjectInputStream readStream = new ObjectInputStream(readData);
+
+            props = (ArrayList<Property>) readStream.readObject();
+
+            readStream.close();
+            printProperties();
+        }
+        catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static void writeProperty(){
+        //write to file
+        try{
+            FileOutputStream writeData = new FileOutputStream("propertyData");
+            ObjectOutputStream writeStream = new ObjectOutputStream(writeData);
+
+            writeStream.writeObject(props);
+            writeStream.flush();
+            writeStream.close();
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
 

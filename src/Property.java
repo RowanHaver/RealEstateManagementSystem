@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.List;
 
+
 public class Property implements Serializable {
     // declare instance variables
     // variable for each instance/object of a class
@@ -127,9 +128,6 @@ public class Property implements Serializable {
     }
 
 
-    public void ObservableLisToArray(){
-        //List<Property> showing = properties.getItems();
-    }
 
 
 
